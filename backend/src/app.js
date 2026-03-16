@@ -12,7 +12,7 @@ app.use("/tasks", require("./routes/taskRoute"));
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Collabzz Task Manager API is running 🚀",
+    message: "Task Manager API is running 🚀",
     version: "1.0.0",
   });
 });
