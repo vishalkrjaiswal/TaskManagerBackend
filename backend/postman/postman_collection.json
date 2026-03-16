@@ -1,0 +1,219 @@
+{
+  "info": {
+    "name": "Task Manager API",
+    "_postman_id": "task-manager-v1",
+    "description": "Complete REST API collection for Team Task Manager",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Vishal Jaiswal\",\n  \"email\": \"vishal@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Account created successfully.\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"id\": \"665f1a2b3c4d5e6f7a8b9c0d\",\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\",\n      \"role\": \"user\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('TOKEN', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"vishal@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Logged in successfully.\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"id\": \"665f1a2b3c4d5e6f7a8b9c0d\",\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\",\n      \"role\": \"user\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/auth/me", "host": ["{{BASE_URL}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fix login bug\",\n  \"description\": \"The login page crashes on mobile Safari.\",\n  \"status\": \"todo\",\n  \"assignedTo\": null\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/tasks", "host": ["{{BASE_URL}}"], "path": ["tasks"] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Task created successfully.\",\n  \"data\": {\n    \"task\": {\n      \"_id\": \"665f1a2b3c4d5e6f7a8b9c1e\",\n      \"title\": \"Fix login bug\",\n      \"description\": \"The login page crashes on mobile Safari.\",\n      \"status\": \"todo\",\n      \"assignedTo\": null,\n      \"createdBy\": { \"_id\": \"665f1a2b3c4d5e6f7a8b9c0d\", \"name\": \"John Doe\", \"email\": \"john@example.com\" },\n      \"createdAt\": \"2024-06-01T10:00:00.000Z\",\n      \"updatedAt\": \"2024-06-01T10:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks?page=1&limit=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "todo", "disabled": true },
+                { "key": "search", "value": "bug", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Tasks (Filter by Status)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks?status=in-progress",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks"],
+              "query": [{ "key": "status", "value": "in-progress" }]
+            }
+          }
+        },
+        {
+          "name": "Search Tasks by Title",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks?search=login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks"],
+              "query": [{ "key": "search", "value": "login" }]
+            }
+          }
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks", ":id"],
+              "variable": [{ "key": "id", "value": "665f1a2b3c4d5e6f7a8b9c1e" }]
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fix login bug (updated)\",\n  \"status\": \"in-progress\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/tasks/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks", ":id"],
+              "variable": [{ "key": "id", "value": "665f1a2b3c4d5e6f7a8b9c1e" }]
+            }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks", ":id"],
+              "variable": [{ "key": "id", "value": "665f1a2b3c4d5e6f7a8b9c1e" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
